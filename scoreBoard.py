@@ -8,7 +8,7 @@ class ScoreBoard(QDockWidget):
     def __init__(self):
         super().__init__()
         self.initUI()
-
+    #initiates bb
     def initUI(self):
         '''initiates ScoreBoard UI'''
         self.resize(200, 200)
