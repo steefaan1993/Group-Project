@@ -34,7 +34,7 @@ class Board(QFrame):
             [0,0,0,0,0,0,0,0],
             [2,0,2,0,2,0,2,0],
             [0,2,0,2,0,2,0,2],
-            [2,0,2,0,2,0,2,0]]# 2d int/Piece array to story the state of the game
+            [2,0,2,0,2,0,2,0]]# 2d int/Piece array to store the state of the game
         self.printBoardArray()
 
 
@@ -203,7 +203,8 @@ class Board(QFrame):
                     painter.setBrush(Qt.red)
 
                 # Todo draw some the pieces as elipses
-                radius = (self.squareWidth() - 2) / 2
-                center = QPoint(radius, radius)
-                painter.drawEllipse(center, radius, radius )
+                radiusW = (self.squareWidth() - 2) / 2
+                radiusH = (self.squareHeight() - 2) / 2
+                center = QPoint(radiusW, radiusH)
+                painter.drawEllipse(center, radiusW, radiusH )
                 painter.restore()
