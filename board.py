@@ -12,9 +12,14 @@ class Board(QFrame):
     boardHeight = 8
     Speed =300
 
+
+
     def __init__(self, parent):
         super().__init__(parent)
         self.initBoard()
+        self.newcol=0
+        self.newrow=0
+
 
     def initBoard(self):
         '''initiates board'''
@@ -27,14 +32,14 @@ class Board(QFrame):
         self.resetGame()
 
         self.boardArray = [
-            [0,1,0,1,0,1,0,1],
-            [1,0,1,0,1,0,1,0],
-            [0,1,0,1,0,1,0,1],
-            [0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0],
-            [2,0,2,0,2,0,2,0],
-            [0,2,0,2,0,2,0,2],
-            [2,0,2,0,2,0,2,0]]# 2d int/Piece array to store the state of the game
+            [8,1,8,1,8,1,8,1],
+            [1,8,1,8,1,8,1,8],
+            [8,1,8,1,8,1,8,1],
+            [0,8,0,8,0,8,0,8],
+            [8,0,8,0,8,0,8,0],
+            [2,8,2,8,2,8,2,8],
+            [8,2,8,2,8,2,8,2],
+            [2,8,2,8,2,8,2,8]]# 2d int/Piece array to story the state of the game
         self.printBoardArray()
 
 
@@ -50,6 +55,7 @@ class Board(QFrame):
         squareWidth= self.squareWidth()
         row=int(yMouseEvent/squareHeight)
         col = int(xMouseEvent / squareWidth)
+        return row, col
         '''convert the mouse click event to a row and column'''
 
     def squareWidth(self):
@@ -100,7 +106,37 @@ class Board(QFrame):
     def mousePressEvent(self, event):
         print("click location [", event.x(), ",", event.y(), "]")
         # todo you could call some game locig here
-        self.mousePosToColRow(event)
+
+        val = self.mousePosToColRow(event)
+        if(self.newcol == val[1]):
+            print("sameVal")
+        if(self.newrow == val[0]):
+            print("sameVal")
+        else:
+            if (self.boardArray[self.newrow][self.newcol] == 1):
+                print('Yellow Piece is seleced')
+                self.boardArray[self.newrow][self.newcol] = 0
+                self.boardArray[val[0]][val[1]] = 1
+
+            elif(self.boardArray[self.newrow][self.newcol] == 2):
+                print('Red Piece is seleced')
+                self.boardArray[self.newrow][self.newcol] = 0
+                self.boardArray[val[0]][val[1]] = 2
+
+
+        #Bis hier sind val die neue werte und newrow/col die alten
+
+        self.newrow=val[0]
+        self.newcol=val[1]
+
+        painter = QPainter(self)
+
+        self.printBoardArray()
+
+        self.drawPieces(painter)
+        self.update()
+
+
 
     def keyPressEvent(self, event):
         '''processes key press events if you would like to do any'''
@@ -164,17 +200,12 @@ class Board(QFrame):
         for row in range(0, Board.boardHeight):
             for col in range(0, Board.boardWidth):
                 if((row+col)%2==0):
-                    print('white')
                     painter.setBrush(Qt.white)
                 else:
-                    print('black')
                     painter.setBrush(Qt.black)
 
                 rowprint = self.squareWidth()
                 colprint = self.squareHeight()
-
-                print(rowprint)
-                print(colprint)
                 painter.save()
                 painter.translate(col*colTransformation, row*rowTransformation)
                 painter.fillRect(0, 0, rowprint, colprint, painter.brush())
@@ -206,5 +237,5 @@ class Board(QFrame):
                 radiusW = (self.squareWidth() - 2) / 2
                 radiusH = (self.squareHeight() - 2) / 2
                 center = QPoint(radiusW, radiusH)
-                painter.drawEllipse(center, radiusW, radiusH )
+                painter.drawEllipse(center, radiusW, radiusH)
                 painter.restore()
