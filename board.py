@@ -108,6 +108,7 @@ class Board(QFrame):
         # todo you could call some game locig here
 
         val = self.mousePosToColRow(event)
+
         if(self.newcol == val[1]):
             print("sameVal")
         if(self.newrow == val[0]):
@@ -115,16 +116,18 @@ class Board(QFrame):
         else:
             if (self.boardArray[self.newrow][self.newcol] == 1):
                 print('Yellow Piece is seleced')
-                self.boardArray[self.newrow][self.newcol] = 0
-                self.boardArray[val[0]][val[1]] = 1
+
+                if(self.boardArray[val[0]][val[1]]!=8):
+                    self.boardArray[self.newrow][self.newcol] = 0
+                    self.boardArray[val[0]][val[1]] = 1
 
             elif(self.boardArray[self.newrow][self.newcol] == 2):
                 print('Red Piece is seleced')
-                self.boardArray[self.newrow][self.newcol] = 0
-                self.boardArray[val[0]][val[1]] = 2
 
+                if (self.boardArray[val[0]][val[1]] != 8):
+                    self.boardArray[self.newrow][self.newcol] = 0
+                    self.boardArray[val[0]][val[1]] = 2
 
-        #Bis hier sind val die neue werte und newrow/col die alten
 
         self.newrow=val[0]
         self.newcol=val[1]
@@ -135,6 +138,49 @@ class Board(QFrame):
 
         self.drawPieces(painter)
         self.update()
+
+    #not yet tested
+    def findingValidFieldsPlayer1(self, oldcol, oldrow):
+        possMov=[]
+        oldrow+=1
+        if(oldcol-1==0):
+            possMov.append(oldrow,oldcol)
+        elif(oldcol-1==2):
+            newrow=oldrow+1
+            oldcol-=1
+            if(oldcol==0):
+                possMov.append(newrow,oldcol)
+
+        if (oldcol + 1 == 0):
+            possMov.append(oldrow, oldcol)
+        elif (oldcol + 1 == 2):
+            newrow = oldrow + 1
+            oldcol += 1
+            if (oldcol == 0):
+                possMov.append(newrow, oldcol)
+
+    #not yet tested
+    def findingValidFieldsPlayer2(self, oldcol, oldrow):
+        possMov = []
+        oldrow += 1
+        if (oldcol - 1 == 0):
+            possMov.append(oldrow, oldcol)
+        elif (oldcol - 1 == 2):
+            newrow = oldrow + 1
+            oldcol -= 1
+            if (oldcol == 0):
+                possMov.append(newrow, oldcol)
+
+        if (oldcol + 1 == 0):
+            possMov.append(oldrow, oldcol)
+        elif (oldcol + 1 == 2):
+            newrow = oldrow + 1
+            oldcol += 1
+            if (oldcol == 0):
+                possMov.append(newrow, oldcol)
+
+            
+
 
 
 
