@@ -202,25 +202,26 @@ class Board(QFrame):
                 if (oldcol - 1 >= 0):
                     self.possMov[oldrow][oldcol - 1] = 1
 
-            elif (self.boardArray[oldrow][oldcol - 1] == 2 and oldcol >= 0):
+            elif (self.boardArray[oldrow][oldcol - 1] == 1 and oldcol >= 0):
                 newrow = oldrow - 1
-                newcol = oldcol + 1
+                newcol = oldcol - 1
                 if (newrow <= 7):
                     if (self.boardArray[oldrow][newcol] == 0):
                         self.possMov[newrow][newcol] = 1
 
             if (oldcol <= 7):
-                if (self.boardArray[oldrow][oldcol] == 0):
-                    self.possMov[oldrow][oldcol] = 1
+                if (self.boardArray[oldrow][oldcol+1] == 0):
+                    self.possMov[oldrow][oldcol+1] = 1
 
-                elif (self.boardArray[oldrow][oldcol] == 2):
+                elif (self.boardArray[oldrow][oldcol+1] == 1):
                     newrow = oldrow - 1
-                    oldcol += 1
+                    oldcol += 2
                     if (newrow <= 7):
-                        if (self.boardArray[newrow][oldcol] == 0):
-                            self.possMov[newrow][oldcol] = 1
-                        elif (self.boardArray[newrow][oldcol - 2] == 0):
-                            self.possMov[newrow][oldcol] = 1
+                        if(oldcol<=7):
+                            if (self.boardArray[newrow][oldcol] == 0):
+                                self.possMov[newrow][oldcol] = 1
+                            elif (self.boardArray[newrow][oldcol - 2] == 0):
+                                self.possMov[newrow][oldcol] = 1
 
         return self.possMov
 
