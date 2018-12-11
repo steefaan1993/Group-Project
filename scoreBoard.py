@@ -84,9 +84,11 @@ class ScoreBoard(QDockWidget):
         print('slot ' + clickLoc)
 
     @pyqtSlot(int)
-    def setTimeRemaining(self, timeRemainng):
+    def setTimeRemaining(self, timeRemaining):
         '''updates the time remaining label to show the time remaining'''
-        update = "Time Remaining:" + str(timeRemainng)
-        self.label_timeRemaining.setText(update)
+        update = "Timer: " + str(timeRemaining)
+        self.timerLabel.setText(update)
         print('slot '+update)
-        # self.redraw()
+        #self.redraw()
+        if Board.counter == 0:
+            self.timerLabel.setText("GameOver")
