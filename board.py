@@ -19,8 +19,8 @@ class Board(QFrame):
     def __init__(self, parent):
         super().__init__(parent)
         self.initBoard()
-        self.newcol=0
-        self.newrow=0
+        self.oldcol=0
+        self.oldrow=0
 
 
     def initBoard(self):
@@ -39,17 +39,40 @@ class Board(QFrame):
             [1,8,1,8,1,8,1,8],
             [8,1,8,1,8,1,8,1],
             [0,8,0,8,0,8,0,8],
-            [8,0,8,0,8,0,8,0],
+            [8,0,8,0,8,1,8,0],
             [2,8,2,8,2,8,2,8],
             [8,2,8,2,8,2,8,2],
             [2,8,2,8,2,8,2,8]]# 2d int/Piece array to story the state of the game
+        self.possMov = [
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0]]
         self.printBoardArray()
-
+    def resetPossMoves(self):
+        self.possMov = [
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0]]
 
     def printBoardArray(self):
         '''prints the boardArray in an arractive way'''
         print("boardArray:")
         print('\n'.join(['\t'.join([str(cell) for cell in row]) for row in self.boardArray]))
+
+    def printPossArray(self):
+        '''prints the boardArray in an arractive way'''
+        print("boardArray:")
+        print('\n'.join(['\t'.join([str(cell) for cell in row]) for row in self.possMov]))
 
     def mousePosToColRow(self, event):
         xMouseEvent= event.x()
@@ -104,6 +127,7 @@ class Board(QFrame):
         '''paints the board and the pieces of the game'''
         painter = QPainter(self)
         self.drawBoardSquares(painter)
+        self.drawPossibleMoves(painter)
         self.drawPieces(painter)
 
     def mousePressEvent(self, event):
@@ -114,94 +138,92 @@ class Board(QFrame):
         print(val[0],val[1])
 
         if (self.boardArray[val[0]][val[1]] == 1):
+            self.resetPossMoves()
             print('Yellow Piece is seleced')
-            self.possmov=self.findingValidFieldsPlayer1(val[0],val[1])
-            print(self.possmov)
-            if(self.boardArray[val[0]][val[1]]!=8):
-                    self.boardArray[self.newrow][self.newcol] = 0
+            possmov=self.findingValidFieldsPlayer1(val[0],val[1])
+            #print(possmov)
+        if (self.boardArray[self.oldrow][self.oldcol] == 1):
+            if(self.possMov[val[0]][val[1]]==1):
+                    self.boardArray[self.oldrow][self.oldcol] = 0
                     self.boardArray[val[0]][val[1]] = 1
+                    self.resetPossMoves()
 
-        elif(self.boardArray[val[0]][val[1]] == 2):
-            self.possmov=self.findingValidFieldsPlayer2(val[0],val[1])
-            print(self.possmov)
-
-            if (self.boardArray[val[0]][val[1]] != 8):
-                    self.boardArray[self.newrow][self.newcol] = 0
+        if (self.boardArray[val[0]][val[1]] == 2):
+            self.resetPossMoves()
+            print('Red Piece is seleced')
+            possmov = self.findingValidFieldsPlayer2(val[0], val[1])
+            #print(possmov)
+        if(self.boardArray[self.oldrow][self.oldcol] == 2):
+            if (self.possMov[val[0]][val[1]] == 1):
+                    self.boardArray[self.oldrow][self.oldcol] = 0
                     self.boardArray[val[0]][val[1]] = 2
+                    self.resetPossMoves()
 
 
-        self.newrow=val[0]
-        self.newcol=val[1]
+        self.oldrow=val[0]
+        self.oldcol=val[1]
 
-        painter = QPainter(self)
+        #self.printBoardArray()
+        self.printPossArray()
 
-        self.printBoardArray()
-
-        self.drawPieces(painter)
         self.update()
 
     #not yet tested
     def findingValidFieldsPlayer1(self, oldrow, oldcol):
-        possMov=[]
         oldrow+=1
         if(oldrow<8):
             if(self.boardArray[oldrow][oldcol-1]==0 and oldcol>=0):
-                possMov.append(oldrow)
-                possMov.append(oldcol-1)
+                self.possMov[oldrow][oldcol - 1]=1
             elif(self.boardArray[oldrow][oldcol-1]==2 and oldcol>=0):
                 newrow=oldrow+1
                 oldcol-=1
                 if(newrow<=7):
                     if(self.boardArray[oldrow][oldcol]==0 and oldcol>=0):
-                        possMov.append(newrow)
-                        possMov.append(oldcol)
-
+                        self.possMov[newrow][oldcol]=1
             oldcol+=1
             if(oldcol<=7):
                 if (self.boardArray[oldrow][oldcol] == 0):
-                    possMov.append(oldrow)
-                    possMov.append(oldcol)
+                    self.possMov[oldrow][oldcol]=1
                 elif (self.boardArray[oldrow][oldcol] == 2):
                     newrow = oldrow + 1
                     oldcol += 1
                     if (newrow <= 7):
                         if (self.boardArray[newrow][oldcol] == 0):
-                            possMov.append(newrow)
-                            possMov.append(oldcol)
+                            self.possMov[newrow][oldcol]=1
+                        elif (self.boardArray[newrow][oldcol-2] == 0):
+                            self.possMov[newrow][oldcol]=1
 
-        return possMov
+        return self.possMov
 
     #not yet tested
     def findingValidFieldsPlayer2(self, oldrow, oldcol):
-        possMov = []
         oldrow -= 1
         if (oldrow < 8):
             if (self.boardArray[oldrow][oldcol - 1] == 0 and oldcol >= 0):
                 if(oldcol-1>=0):
-                    possMov.append(oldrow)
-                    possMov.append(oldcol - 1)
-            elif (self.boardArray[oldrow][oldcol - 1] == 2 and oldcol >= 0):
-                newrow = oldrow + 1
-                oldcol -= 1
-                if (newrow <= 7):
-                    if (self.boardArray[oldrow][oldcol] == 0 and oldcol >= 0):
-                        possMov.append(newrow)
-                        possMov.append(oldcol)
+                    self.possMov[oldrow][oldcol-1]=1
 
-            oldcol += 1
+            elif (self.boardArray[oldrow][oldcol - 1] == 2 and oldcol >= 0):
+                newrow = oldrow - 1
+                newcol = oldcol+1
+                if (newrow <= 7):
+                    if (self.boardArray[oldrow][newcol] == 0):
+                        self.possMov[newrow][newcol]=1
+
             if (oldcol <= 7):
                 if (self.boardArray[oldrow][oldcol] == 0):
-                    possMov.append(oldrow)
-                    possMov.append(oldcol)
+                    self.possMov[oldrow][oldcol]=1
+
                 elif (self.boardArray[oldrow][oldcol] == 2):
-                    newrow = oldrow + 1
+                    newrow = oldrow - 1
                     oldcol += 1
                     if (newrow <= 7):
                         if (self.boardArray[newrow][oldcol] == 0):
-                            possMov.append(newrow)
-                            possMov.append(oldcol)
+                            self.possMov[newrow][oldcol]=1
+                        elif (self.boardArray[newrow][oldcol-2] == 0):
+                            self.possMov[newrow][oldcol]=1
 
-        return possMov
+        return self.possMov
 
             
 
@@ -279,6 +301,7 @@ class Board(QFrame):
                 else:
                     painter.setBrush(Qt.black)
 
+
                 rowprint = self.squareWidth()
                 colprint = self.squareHeight()
                 painter.save()
@@ -287,6 +310,23 @@ class Board(QFrame):
 
                 painter.restore()
 
+    def drawPossibleMoves(self, painter):
+        painter.setBrush(Qt.transparent)
+
+        colTransformation = self.squareWidth()
+        rowTransformation = self.squareHeight()
+        for row in range(0, Board.boardHeight):
+            for col in range(0, Board.boardWidth):
+                if(self.possMov[row][col]==1):
+                    painter.setBrush(Qt.cyan)
+                rowprint = self.squareWidth()
+                colprint = self.squareHeight()
+                painter.save()
+                painter.translate(col * colTransformation, row * rowTransformation)
+                painter.fillRect(0, 0, rowprint, colprint, painter.brush())
+
+                painter.restore()
+                painter.setBrush(Qt.transparent)
 
 
 
