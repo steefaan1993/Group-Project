@@ -6,12 +6,14 @@ from piece import Piece
 
 class Board(QFrame):
     msg2Statusbar = pyqtSignal(str)
-
+    updateTimerSignal = pyqtSignal(int)  # signal sent when timer is updated
+    clickLocationSignal = pyqtSignal(str)  # signal sent when there is a new click location
     # todo set the board with and height in square
     boardWidth = 8
     boardHeight = 8
     Speed =300
-
+    timerSpeed = 1000  # the timer updates ever 1 second
+    counter = 10  # the number the counter will count down from
 
 
     def __init__(self, parent):
@@ -23,8 +25,9 @@ class Board(QFrame):
 
     def initBoard(self):
         '''initiates board'''
-        self.timer = QBasicTimer()
-        self.isWaitingAfterLine = False
+        #self.timer = QBasicTimer()
+        #self.isWaitingAfterLine = False
+        #self.start()
 
         # self.setFocusPolicy(Qt.StrongFocus)
         self.isStarted = False
@@ -78,7 +81,7 @@ class Board(QFrame):
 
         self.msg2Statusbar.emit(str("status message"))
 
-        self.timer.start(Board.Speed, self)
+        #self.timer.start(Board.Speed, self)
 
     def pause(self):
         '''pauses game'''
@@ -108,23 +111,21 @@ class Board(QFrame):
         # todo you could call some game locig here
 
         val = self.mousePosToColRow(event)
+        print(val[0],val[1])
 
-        if(self.newcol == val[1]):
-            print("sameVal")
-        if(self.newrow == val[0]):
-            print("sameVal")
-        else:
-            if (self.boardArray[self.newrow][self.newcol] == 1):
-                print('Yellow Piece is seleced')
-
-                if(self.boardArray[val[0]][val[1]]!=8):
+        if (self.boardArray[val[0]][val[1]] == 1):
+            print('Yellow Piece is seleced')
+            self.possmov=self.findingValidFieldsPlayer1(val[0],val[1])
+            print(self.possmov)
+            if(self.boardArray[val[0]][val[1]]!=8):
                     self.boardArray[self.newrow][self.newcol] = 0
                     self.boardArray[val[0]][val[1]] = 1
 
-            elif(self.boardArray[self.newrow][self.newcol] == 2):
-                print('Red Piece is seleced')
+        elif(self.boardArray[val[0]][val[1]] == 2):
+            self.possmov=self.findingValidFieldsPlayer2(val[0],val[1])
+            print(self.possmov)
 
-                if (self.boardArray[val[0]][val[1]] != 8):
+            if (self.boardArray[val[0]][val[1]] != 8):
                     self.boardArray[self.newrow][self.newcol] = 0
                     self.boardArray[val[0]][val[1]] = 2
 
@@ -140,44 +141,67 @@ class Board(QFrame):
         self.update()
 
     #not yet tested
-    def findingValidFieldsPlayer1(self, oldcol, oldrow):
+    def findingValidFieldsPlayer1(self, oldrow, oldcol):
         possMov=[]
         oldrow+=1
-        if(oldcol-1==0):
-            possMov.append(oldrow,oldcol)
-        elif(oldcol-1==2):
-            newrow=oldrow+1
-            oldcol-=1
-            if(oldcol==0):
-                possMov.append(newrow,oldcol)
+        if(oldrow<8):
+            if(self.boardArray[oldrow][oldcol-1]==0 and oldcol>=0):
+                possMov.append(oldrow)
+                possMov.append(oldcol-1)
+            elif(self.boardArray[oldrow][oldcol-1]==2 and oldcol>=0):
+                newrow=oldrow+1
+                oldcol-=1
+                if(newrow<=7):
+                    if(self.boardArray[oldrow][oldcol]==0 and oldcol>=0):
+                        possMov.append(newrow)
+                        possMov.append(oldcol)
 
-        if (oldcol + 1 == 0):
-            possMov.append(oldrow, oldcol)
-        elif (oldcol + 1 == 2):
-            newrow = oldrow + 1
-            oldcol += 1
-            if (oldcol == 0):
-                possMov.append(newrow, oldcol)
+            oldcol+=1
+            if(oldcol<=7):
+                if (self.boardArray[oldrow][oldcol] == 0):
+                    possMov.append(oldrow)
+                    possMov.append(oldcol)
+                elif (self.boardArray[oldrow][oldcol] == 2):
+                    newrow = oldrow + 1
+                    oldcol += 1
+                    if (newrow <= 7):
+                        if (self.boardArray[newrow][oldcol] == 0):
+                            possMov.append(newrow)
+                            possMov.append(oldcol)
+
+        return possMov
 
     #not yet tested
-    def findingValidFieldsPlayer2(self, oldcol, oldrow):
+    def findingValidFieldsPlayer2(self, oldrow, oldcol):
         possMov = []
-        oldrow += 1
-        if (oldcol - 1 == 0):
-            possMov.append(oldrow, oldcol)
-        elif (oldcol - 1 == 2):
-            newrow = oldrow + 1
-            oldcol -= 1
-            if (oldcol == 0):
-                possMov.append(newrow, oldcol)
+        oldrow -= 1
+        if (oldrow < 8):
+            if (self.boardArray[oldrow][oldcol - 1] == 0 and oldcol >= 0):
+                if(oldcol-1>=0):
+                    possMov.append(oldrow)
+                    possMov.append(oldcol - 1)
+            elif (self.boardArray[oldrow][oldcol - 1] == 2 and oldcol >= 0):
+                newrow = oldrow + 1
+                oldcol -= 1
+                if (newrow <= 7):
+                    if (self.boardArray[oldrow][oldcol] == 0 and oldcol >= 0):
+                        possMov.append(newrow)
+                        possMov.append(oldcol)
 
-        if (oldcol + 1 == 0):
-            possMov.append(oldrow, oldcol)
-        elif (oldcol + 1 == 2):
-            newrow = oldrow + 1
             oldcol += 1
-            if (oldcol == 0):
-                possMov.append(newrow, oldcol)
+            if (oldcol <= 7):
+                if (self.boardArray[oldrow][oldcol] == 0):
+                    possMov.append(oldrow)
+                    possMov.append(oldcol)
+                elif (self.boardArray[oldrow][oldcol] == 2):
+                    newrow = oldrow + 1
+                    oldcol += 1
+                    if (newrow <= 7):
+                        if (self.boardArray[newrow][oldcol] == 0):
+                            possMov.append(newrow)
+                            possMov.append(oldcol)
+
+        return possMov
 
             
 
@@ -224,10 +248,15 @@ class Board(QFrame):
         '''handles timer event'''
         #todo adapter this code to handle your timers
 
-        if event.timerId() == self.timer.timerId():
-            pass
+        # todo adapter this code to handle your timers
+        if event.timerId() == self.timer.timerId():  # if the timer that has 'ticked' is the one in this class
+            if Board.counter == 0:
+                print("Game over")
+            Board.counter = Board.counter - 1
+            print('timerEvent()', Board.counter)
+            self.updateTimerSignal.emit(Board.counter)
         else:
-            super(Board, self).timerEvent(event)
+            super(Board, self).timerEvent(event)  # other wise pass it to the super class for handling
 
     def resetGame(self):
         '''clears pieces from the board'''
