@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication
+from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication, QAction, QMessageBox, QInputDialog
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from board import Board
@@ -21,9 +21,19 @@ class Draughts(QMainWindow):
 
         # SETTING UP TWO MENUS IN MENU BAR
         fileMenu = mainMenu.addMenu(" File")
-        fileMenu.addAction(QIcon("./img/settings.png"), "Options")
-        fileMenu.addAction(QIcon("./img/reset.png"), "Reset")
-        fileMenu.addAction(QIcon("./img/exit.png"), "Exit")
+
+        optionAction = QAction(QIcon("./img/settings.png"), "Options", self)
+        fileMenu.addAction(optionAction)
+        optionAction.triggered.connect(self.option)
+
+        resetAction = QAction(QIcon("./img/reset.png"), "Reset", self)
+        fileMenu.addAction(resetAction)
+        resetAction.triggered.connect(Board.resetGame)
+
+        exitAction = QAction(QIcon("./img/exit.png"), "Exit", self)
+        fileMenu.addAction(exitAction)
+        exitAction.triggered.connect(self.exit)
+
         helpMenu = mainMenu.addMenu("Help")
         help = helpMenu.addMenu(QIcon("./img/help.png")," Help")
         help.addAction( "How To Play")
@@ -51,3 +61,46 @@ class Draughts(QMainWindow):
         size = self.geometry()
         self.move((screen.width() - size.width()) / 2,
                   (screen.height() - size.height()) / 2)
+
+    def option(self):
+        items = ("Red", "Blue", "Green", "Yellow", "Pink")
+        item, okPressed = QInputDialog.getItem(self, "Options", "Player1 Colour:", items, 0, False)
+        if okPressed and item:
+            print(item)
+        if item == "Red":
+            items2 = ("Blue", "Yellow")
+        elif item == "Blue":
+            items2 = ("Red", "Green", "Yellow", "Pink")
+        else:
+            items2 = ("Blue", "Yellow", "Pink")
+        item2, okPressed = QInputDialog.getItem(self, "Options", "Player2 Colour:", items2, 0, False)
+        if okPressed and item2:
+            print(item2)
+
+    def exit(
+            self):  # it's an option for users to pick to exit. It'll automatically get connected to the closeEvent method down below.
+        self.close()
+
+        # CLOSE EVENT METHOD FOR CLICKING THE 'X' BUTTON
+
+    def closeEvent(self, event):  # a window to pop up when the user wants to exit using 'X' button.
+        # window asks the user if they're sure to exit and give them options to say yes, save or cancel.
+        # selecting yes will close the app.
+        # selecting save will get connected to the save method and check if user actually saved the file. If they didn't it won't close the application.
+        # selecting cancel will ignore the request and keep the application open.
+        close = QMessageBox()
+        close.setWindowTitle("Exit")
+        close.setWindowIcon(QIcon("./img/exit.png"))
+        close.setText("Are you sure you want to quit?\n")
+        close.setStandardButtons(QMessageBox.Yes | QMessageBox.Save | QMessageBox.Cancel)
+        close = close.exec()
+        if close == QMessageBox.Yes:
+            event.accept()
+       # elif close == QMessageBox.Save:
+        #    save = self.save()
+         #   if save == False:
+          #      event.ignore()
+           # else:
+            #    event.accept()
+        else:
+            event.ignore()
