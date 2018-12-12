@@ -32,6 +32,8 @@ class Board(QFrame):
         self.isStarted = False
         self.isPaused = False
         self.resetGame()
+        self.jumpp1=0
+        self.jumpp2=0
 
         self.boardArray = [
             [8, 1, 8, 1, 8, 1, 8, 1],
@@ -52,6 +54,18 @@ class Board(QFrame):
             [0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0]]
         self.printBoardArray()
+
+    def resetBoardArray(self):
+        self.boardArray = [
+            [8, 1, 8, 1, 8, 1, 8, 1],
+            [1, 8, 1, 8, 1, 8, 1, 8],
+            [8, 1, 8, 1, 8, 1, 8, 1],
+            [0, 8, 0, 8, 0, 8, 0, 8],
+            [8, 0, 8, 0, 8, 1, 8, 0],
+            [2, 8, 2, 8, 2, 8, 2, 8],
+            [8, 2, 8, 2, 8, 2, 8, 2],
+            [2, 8, 2, 8, 2, 8, 2, 8]]
+
 
     def resetPossMoves(self):
         self.possMov = [
@@ -140,24 +154,46 @@ class Board(QFrame):
         if (self.boardArray[val[0]][val[1]] == 1):
             self.resetPossMoves()
             print('Yellow Piece is seleced')
-            possmov = self.findingValidFieldsPlayer1(val[0], val[1])
+            self.possMov = self.findingValidFieldsPlayer1(val[0], val[1])
             # print(possmov)
         if (self.boardArray[self.oldrow][self.oldcol] == 1):
             if (self.possMov[val[0]][val[1]] == 1):
-                self.boardArray[self.oldrow][self.oldcol] = 0
-                self.boardArray[val[0]][val[1]] = 1
-                self.resetPossMoves()
+                if(self.oldcol+2==val[1]):
+                    self.boardArray[self.oldrow+1][self.oldcol+1]=0
+                    self.boardArray[self.oldrow][self.oldcol] = 0
+                    self.boardArray[val[0]][val[1]] = 1
+                    self.resetPossMoves()
+                elif (self.oldcol - 2 == val[1]):
+                    self.boardArray[self.oldrow + 1][self.oldcol - 1] = 0
+                    self.boardArray[self.oldrow][self.oldcol] = 0
+                    self.boardArray[val[0]][val[1]] = 1
+                    self.resetPossMoves()
+                else:
+                    self.boardArray[self.oldrow][self.oldcol] = 0
+                    self.boardArray[val[0]][val[1]] = 1
+                    self.resetPossMoves()
 
         if (self.boardArray[val[0]][val[1]] == 2):
             self.resetPossMoves()
             print('Red Piece is seleced')
-            possmov = self.findingValidFieldsPlayer2(val[0], val[1])
+            self.possMov = self.findingValidFieldsPlayer2(val[0], val[1])
             # print(possmov)
         if (self.boardArray[self.oldrow][self.oldcol] == 2):
             if (self.possMov[val[0]][val[1]] == 1):
-                self.boardArray[self.oldrow][self.oldcol] = 0
-                self.boardArray[val[0]][val[1]] = 2
-                self.resetPossMoves()
+                if (self.oldcol + 2 == val[1]):
+                    self.boardArray[self.oldrow - 1][self.oldcol + 1] = 0
+                    self.boardArray[self.oldrow][self.oldcol] = 0
+                    self.boardArray[val[0]][val[1]] = 2
+                    self.resetPossMoves()
+                elif (self.oldcol - 2 == val[1]):
+                    self.boardArray[self.oldrow - 1][self.oldcol - 1] = 0
+                    self.boardArray[self.oldrow][self.oldcol] = 0
+                    self.boardArray[val[0]][val[1]] = 2
+                    self.resetPossMoves()
+                else:
+                    self.boardArray[self.oldrow][self.oldcol] = 0
+                    self.boardArray[val[0]][val[1]] = 2
+                    self.resetPossMoves()
 
         self.oldrow = val[0]
         self.oldcol = val[1]
@@ -167,18 +203,21 @@ class Board(QFrame):
 
         self.update()
 
-    # not yet tested
+
     def findingValidFieldsPlayer1(self, oldrow, oldcol):
         oldrow += 1
         if (oldrow < 8):
             if (self.boardArray[oldrow][oldcol - 1] == 0 and oldcol >= 0):
-                self.possMov[oldrow][oldcol - 1] = 1
-            elif (self.boardArray[oldrow][oldcol - 1] == 2 and oldcol >= 0):
+                if(oldcol-1>=0):
+                    self.possMov[oldrow][oldcol - 1] = 1
+            if (self.boardArray[oldrow][oldcol - 1] == 2 and oldcol >= 0):
                 newrow = oldrow + 1
-                oldcol -= 1
+                newcol = oldcol - 2
                 if (newrow <= 7):
-                    if (self.boardArray[oldrow][oldcol] == 0 and oldcol >= 0):
-                        self.possMov[newrow][oldcol] = 1
+                    if(newcol>=0):
+                        if (self.boardArray[newrow][newcol] == 0 and oldcol >= 0):
+                            self.resetPossMoves()
+                            self.possMov[newrow][newcol] = 1
             oldcol += 1
             if (oldcol <= 7):
                 if (self.boardArray[oldrow][oldcol] == 0):
@@ -186,42 +225,46 @@ class Board(QFrame):
                 elif (self.boardArray[oldrow][oldcol] == 2):
                     newrow = oldrow + 1
                     oldcol += 1
-                    if (newrow <= 7):
+                    if (newrow <= 7 and oldcol<=7):
                         if (self.boardArray[newrow][oldcol] == 0):
+                            self.resetPossMoves()
                             self.possMov[newrow][oldcol] = 1
-                        elif (self.boardArray[newrow][oldcol - 2] == 0):
-                            self.possMov[newrow][oldcol] = 1
+                        if (oldcol + 2 <= 7):
+                            if (self.boardArray[newrow][oldcol + 2] == 0):
+                                self.possMov[newrow][oldcol+2] = 1
 
         return self.possMov
 
-    # not yet tested
+
     def findingValidFieldsPlayer2(self, oldrow, oldcol):
         oldrow -= 1
-        if (oldrow < 8):
-            if (self.boardArray[oldrow][oldcol - 1] == 0 and oldcol >= 0):
+        if (oldrow <=7 and oldrow>=0):
+            if (self.boardArray[oldrow][oldcol - 1] == 0):
                 if (oldcol - 1 >= 0):
                     self.possMov[oldrow][oldcol - 1] = 1
 
-            elif (self.boardArray[oldrow][oldcol - 1] == 1 and oldcol >= 0):
+            if (self.boardArray[oldrow][oldcol - 1] == 1):
                 newrow = oldrow - 1
-                newcol = oldcol - 1
-                if (newrow <= 7):
-                    if (self.boardArray[oldrow][newcol] == 0):
+                newcol = oldcol - 2
+                if (newrow <= 7 and newrow>0):
+                    if (self.boardArray[newrow][newcol] == 0):
+                        self.resetPossMoves()
                         self.possMov[newrow][newcol] = 1
 
-            if (oldcol <= 7):
+            if (oldcol+1 <= 7):
                 if (self.boardArray[oldrow][oldcol+1] == 0):
                     self.possMov[oldrow][oldcol+1] = 1
 
                 elif (self.boardArray[oldrow][oldcol+1] == 1):
                     newrow = oldrow - 1
                     oldcol += 2
-                    if (newrow <= 7):
+                    if (newrow <= 7 and newrow>0):
                         if(oldcol<=7):
                             if (self.boardArray[newrow][oldcol] == 0):
+                                self.resetPossMoves()
                                 self.possMov[newrow][oldcol] = 1
                             elif (self.boardArray[newrow][oldcol - 2] == 0):
-                                self.possMov[newrow][oldcol] = 1
+                                self.possMov[newrow][oldcol-2] = 1
 
         return self.possMov
 
@@ -276,6 +319,10 @@ class Board(QFrame):
             super(Board, self).timerEvent(event)  # other wise pass it to the super class for handling
 
     def resetGame(self):
+        self.resetPossMoves()
+        self.resetBoardArray()
+        self.jumpp1=0
+        self.jumpp2=0
         '''clears pieces from the board'''
         # todo write code to reset game
 
