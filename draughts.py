@@ -28,7 +28,7 @@ class Draughts(QMainWindow):
 
         resetAction = QAction(QIcon("./img/reset.png"), "Reset", self)
         fileMenu.addAction(resetAction)
-        resetAction.triggered.connect(Board.resetGame)
+        resetAction.triggered.connect(self.tboard.resetGame)
 
         exitAction = QAction(QIcon("./img/exit.png"), "Exit", self)
         fileMenu.addAction(exitAction)
@@ -68,14 +68,35 @@ class Draughts(QMainWindow):
         if okPressed and item:
             print(item)
         if item == "Red":
+            player1colour = Qt.red
             items2 = ("Blue", "Yellow")
         elif item == "Blue":
+            player1colour = Qt.blue
             items2 = ("Red", "Green", "Yellow", "Pink")
+        elif item == "Yellow":
+            player1colour = Qt.yellow
+            items2 = ("Red", "Green", "Blue", "Pink")
+        elif item == "Pink":
+            player1colour = Qt.magenta
+            items2 = ("Green", "Yellow", "Blue")
         else:
+            player1colour = Qt.green
             items2 = ("Blue", "Yellow", "Pink")
         item2, okPressed = QInputDialog.getItem(self, "Options", "Player2 Colour:", items2, 0, False)
         if okPressed and item2:
             print(item2)
+        if item2 == "Red":
+            player2colour = Qt.red
+        elif item2 == "Blue":
+            player2colour = Qt.blue
+        elif item2 == "Yellow":
+            player2colour = Qt.yellow
+        elif item2 == "Pink":
+            player2colour = Qt.magenta
+        else:
+            player2colour = Qt.green
+        self.tboard.ColorSelection(player1colour, player2colour)
+
 
     def exit(
             self):  # it's an option for users to pick to exit. It'll automatically get connected to the closeEvent method down below.
