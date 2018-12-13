@@ -35,6 +35,9 @@ class Board(QFrame):
         self.jumpp1=0
         self.jumpp2=0
 
+        self.ColorP1 = Qt.yellow
+        self.ColorP2 = Qt.red
+
         self.P1Turn=True
 
         self.boardArray = [
@@ -333,6 +336,11 @@ class Board(QFrame):
 
                 painter.restore()
 
+    def ColorSelection(self, color1, color2):
+        self.ColorP1=color1
+        self.ColorP2=color2
+
+
     def drawPossibleMoves(self, painter):
         painter.setBrush(Qt.transparent)
 
@@ -364,10 +372,10 @@ class Board(QFrame):
                 draw = False
                 # Todo choose your colour and set the painter brush to the correct colour
                 if self.boardArray[row][col] == 1:
-                    painter.setBrush(Qt.yellow)
+                    painter.setBrush(self.ColorP1)
 
                 elif self.boardArray[row][col] == 2:
-                    painter.setBrush(Qt.red)
+                    painter.setBrush(self.ColorP2)
 
                 # Todo draw some the pieces as elipses
                 radiusW = (self.squareWidth() - 2) / 2
