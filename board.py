@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QFrame
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPoint
-from PyQt5.QtGui import QPainter
+from PyQt5.QtGui import QPainter, QColor
 
 from piece import Piece
 
@@ -41,7 +41,7 @@ class Board(QFrame):
         self.P1Turn=True
 
         self.boardArray = [
-            [8, 0, 8, 1, 8, 1, 8, 1],
+            [8, 4, 8, 1, 8, 1, 8, 1],
             [1, 8, 1, 8, 1, 8, 1, 8],
             [8, 1, 8, 2, 8, 1, 8, 1],
             [0, 8, 0, 8, 0, 8, 0, 8],
@@ -62,7 +62,7 @@ class Board(QFrame):
 
     def resetBoardArray(self):
         self.boardArray = [
-            [8, 0, 8, 1, 8, 1, 8, 1],
+            [8, 4, 8, 1, 8, 1, 8, 1],
             [1, 8, 1, 8, 1, 8, 1, 8],
             [8, 1, 8, 2, 8, 1, 8, 1],
             [0, 8, 0, 8, 0, 8, 0, 8],
@@ -150,6 +150,7 @@ class Board(QFrame):
         self.drawPieces(painter)
 
     def mousePressEvent(self, event):
+        '''jljklkjlkj'''
         print("click location [", event.x(), ",", event.y(), "]")
         # todo you could call some game locig here
 
@@ -168,17 +169,23 @@ class Board(QFrame):
                         self.boardArray[self.oldrow+1][self.oldcol+1]=0
                         self.boardArray[self.oldrow][self.oldcol] = 0
                         self.boardArray[val[0]][val[1]] = 1
+                        if (val[0] == 7):
+                            self.boardArray[val[0]][val[1]] = 3
                         self.jumpp1+=1
                         self.resetPossMoves()
                     elif (self.oldcol - 2 == val[1]):
                         self.boardArray[self.oldrow + 1][self.oldcol - 1] = 0
                         self.boardArray[self.oldrow][self.oldcol] = 0
                         self.boardArray[val[0]][val[1]] = 1
+                        if (val[0] == 7):
+                            self.boardArray[val[0]][val[1]] = 3
                         self.jumpp1 += 1
                         self.resetPossMoves()
                     else:
                         self.boardArray[self.oldrow][self.oldcol] = 0
                         self.boardArray[val[0]][val[1]] = 1
+                        if (val[0] == 7):
+                            self.boardArray[val[0]][val[1]] = 3
                         self.resetPossMoves()
                         self.P1Turn=False
 
@@ -195,17 +202,23 @@ class Board(QFrame):
                         self.boardArray[self.oldrow - 1][self.oldcol + 1] = 0
                         self.boardArray[self.oldrow][self.oldcol] = 0
                         self.boardArray[val[0]][val[1]] = 2
+                        if(val[0]==0):
+                            self.boardArray[val[0]][val[1]] = 4
                         self.jumpp2 += 1
                         self.resetPossMoves()
                     elif (self.oldcol - 2 == val[1]):
                         self.boardArray[self.oldrow - 1][self.oldcol - 1] = 0
                         self.boardArray[self.oldrow][self.oldcol] = 0
                         self.boardArray[val[0]][val[1]] = 2
+                        if (val[0] == 0):
+                            self.boardArray[val[0]][val[1]] = 4
                         self.jumpp2 += 1
                         self.resetPossMoves()
                     else:
                         self.boardArray[self.oldrow][self.oldcol] = 0
                         self.boardArray[val[0]][val[1]] = 2
+                        if (val[0] == 0):
+                            self.boardArray[val[0]][val[1]] = 4
                         self.resetPossMoves()
                         self.P1Turn=True
 
@@ -371,10 +384,10 @@ class Board(QFrame):
                 painter.translate(col * colTransformation, row * rowTransformation)
                 draw = False
                 # Todo choose your colour and set the painter brush to the correct colour
-                if self.boardArray[row][col] == 1:
+                if self.boardArray[row][col] == 1 or self.boardArray[row][col] == 3:
                     painter.setBrush(self.ColorP1)
 
-                elif self.boardArray[row][col] == 2:
+                elif self.boardArray[row][col] == 2 or self.boardArray[row][col]==4:
                     painter.setBrush(self.ColorP2)
 
                 # Todo draw some the pieces as elipses
@@ -382,4 +395,9 @@ class Board(QFrame):
                 radiusH = (self.squareHeight() - 2) / 2
                 center = QPoint(radiusW, radiusH)
                 painter.drawEllipse(center, radiusW, radiusH)
+                #Drawing the crown
+                if self.boardArray[row][col]==3 or self.boardArray[row][col]==4:
+                    crown=QColor(212,175,55)
+                    painter.setBrush(crown)
+                    painter.drawEllipse(center, radiusW/2,radiusH/2)
                 painter.restore()
