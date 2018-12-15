@@ -92,3 +92,14 @@ class ScoreBoard(QDockWidget):
         #self.redraw()
         if Board.counter == 0:
             self.timerLabel.setText("GameOver")
+
+    def seticon(self, p1, p2):
+        player1 = p1.lower()
+        player2 = p2.lower()
+        self.avatar1.load("./img/" + player1 + ".png")
+        self.avatar1Label.setPixmap(self.avatar1)
+        self.avatar2.load("./img/" + player2 + ".png")
+        self.avatar2Label.setPixmap(self.avatar2)
+        self.update()
+
+
