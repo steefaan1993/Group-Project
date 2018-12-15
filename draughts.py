@@ -21,7 +21,6 @@ class Draughts(QMainWindow):
 
         # SETTING UP TWO MENUS IN MENU BAR
         fileMenu = mainMenu.addMenu(" File")
-
         optionAction = QAction(QIcon("./img/settings.png"), "Options", self)
         fileMenu.addAction(optionAction)
         optionAction.triggered.connect(self.option)
@@ -53,7 +52,7 @@ class Draughts(QMainWindow):
         self.setWindowTitle('Draughts')
         self.setWindowIcon(QIcon("./img/checkers.png"))
         self.show()
-
+        self.option()
 
     def center(self):
         '''centers the window on the screen'''
@@ -69,6 +68,7 @@ class Draughts(QMainWindow):
             print(item)
         if item == "Red":
             player1colour = Qt.red
+
             items2 = ("Blue", "Yellow")
         elif item == "Blue":
             player1colour = Qt.blue
@@ -96,6 +96,7 @@ class Draughts(QMainWindow):
         else:
             player2colour = Qt.green
         self.tboard.ColorSelection(player1colour, player2colour)
+        self.scoreBoard.seticon(item, item2)
 
 
     def exit(
