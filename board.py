@@ -8,13 +8,15 @@ from piece import Piece
 class Board(QFrame):
     msg2Statusbar = pyqtSignal(str)
     updateTimerSignal = pyqtSignal(int)  # signal sent when timer is updated
+    updatepTimerSignal = pyqtSignal(int)  # signal sent when timer is updated
     clickLocationSignal = pyqtSignal(str)  # signal sent when there is a new click location
 
     boardWidth = 8
     boardHeight = 8
-    Speed = 300
+    Speed = 600
     timerSpeed = 1000  # the timer updates ever 1 second
-    counter = 10  # the number the counter will count down from
+    counter = 60  # the number the counter will count down from
+    pCounter = 30
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -129,7 +131,6 @@ class Board(QFrame):
 
         self.msg2Statusbar.emit(str("status message"))
 
-        self.timer.start(Board.Speed, self)
 
     def pause(self):
         '''pauses game'''
@@ -467,15 +468,15 @@ class Board(QFrame):
         # todo adapter this code to handle your timers
 
         # todo adapter this code to handle your timers
-        if event.timerId() == self.timer.timerId():  # if the timer that has 'ticked' is the one in this class
-            if Board.counter == 0:
+        if event.timerId() == self.timer.timerId() and Board.counter > 0:  # if the timer that has 'ticked' is the one in this class
+            if Board.counter > 0:
+                Board.counter = Board.counter - 1
+                print('timerEvent()', Board.counter)
+                self.updateTimerSignal.emit(Board.counter)
+            else:
                 print("Game over")
-            Board.counter = Board.counter - 1
-            print('timerEvent()', Board.counter)
-            self.updateTimerSignal.emit(Board.counter)
         else:
             super(Board, self).timerEvent(event)  # other wise pass it to the super class for handling
-
     def resetGame(self):
         '''Method for resetting the game to its initial state.
         It calls the reset arrays methods and it resets the captures variables for each player'''
@@ -516,6 +517,7 @@ class Board(QFrame):
         '''Method for setting the color of the piece of the squares'''
         self.ColorP1=color1
         self.ColorP2=color2
+        self.timer.start(Board.Speed, self)
 
 
     def drawPossibleMoves(self, painter):
