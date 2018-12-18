@@ -78,6 +78,7 @@ class ScoreBoard(QDockWidget):
         board.clickLocationSignal.connect(self.setClickLocation)
         # when the updateTimerSignal is emitted in the board the setTimeRemaining slot receives it
         board.updateTimerSignal.connect(self.setTimeRemaining)
+        board.updatepTimerSignal.connect(self.setpTimeRemaining)
 
     @pyqtSlot(str) # checks to make sure that the following slot is receiving an arguement of the right type
     def setClickLocation(self, clickLoc):
@@ -100,9 +101,9 @@ class ScoreBoard(QDockWidget):
 
     @pyqtSlot(int)
     def setpTimeRemaining(self, pTimeRemaining):
-        update = "Timer: " + str(pTimeRemaining)
-        self.timerLabel.setText(update)
-        print('slot ' + update)
+        update2 = "Player Timer: " + str(pTimeRemaining)
+        self.pTimerLabel.setText(update2)
+        print('slot ' + update2)
         # self.redraw()
 
     def seticon(self, p1, p2):
