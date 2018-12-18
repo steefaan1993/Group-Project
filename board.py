@@ -438,10 +438,11 @@ class Board(QFrame):
                 newrow = oldrow - 1
                 newcol = oldcol - 2
                 if (newrow <= 7 and newrow>=0):
-                    if (self.boardArray[newrow][newcol] == 0):
-                        self.resetPossMoves()
-                        jumpPossible=True
-                        self.possMov[newrow][newcol] = 1
+                    if(newcol>=0):
+                        if (self.boardArray[newrow][newcol] == 0):
+                            self.resetPossMoves()
+                            jumpPossible=True
+                            self.possMov[newrow][newcol] = 1
 
             if (oldcol+1 <= 7 and jumpPossible==False):
                 if (self.boardArray[oldrow][oldcol+1] == 0):
