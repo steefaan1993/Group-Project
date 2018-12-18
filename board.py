@@ -9,14 +9,16 @@ class Board(QFrame):
     msg2Statusbar = pyqtSignal(str)
     updateTimerSignal = pyqtSignal(int)  # signal sent when timer is updated
     updatepTimerSignal = pyqtSignal(int)  # signal sent when timer is updated
+    updatepTurnSignal = pyqtSignal(int)  # signal sent when timer is updated
+    updatePlayers = pyqtSignal(int, int)  # signal sent when timer is updated
     clickLocationSignal = pyqtSignal(str)  # signal sent when there is a new click location
 
     boardWidth = 8
     boardHeight = 8
     Speed = 600
     timerSpeed = 1000  # the timer updates ever 1 second
-    counter = 60  # the number the counter will count down from
-    pCounter = 30
+    counter = 301  # the number the counter will count down from
+    pCounter = 301
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -130,7 +132,7 @@ class Board(QFrame):
         self.numLinesRemoved = 0
         self.resetGame()
 
-        self.msg2Statusbar.emit(str("status message"))
+        self.msg2Statusbar.emit(str("Start"))
 
 
     def pause(self):
@@ -143,11 +145,13 @@ class Board(QFrame):
 
         if self.isPaused:
             self.timer.stop()
-            self.msg2Statusbar.emit("paused")
+            self.ptimer.stop()
+            self.msg2Statusbar.emit("Paused")
 
         else:
             self.timer.start(Board.Speed, self)
-            self.msg2Statusbar.emit(str("status message"))
+            self.ptimer.start(Board.Speed, self)
+            self.msg2Statusbar.emit(str("Game is on"))
         self.update()
 
     def paintEvent(self, event):
@@ -173,7 +177,8 @@ class Board(QFrame):
         print(val[0], val[1])
 
         if(self.P1Turn==True):
-
+            self.timer.start(Board.Speed, self)
+            self.ptimer.stop()
             if (self.boardArray[val[0]][val[1]] == 1):
                 self.resetPossMoves()
                 print('Yellow Piece is seleced')
@@ -193,30 +198,35 @@ class Board(QFrame):
                         self.boardArray[self.oldrow][self.oldcol] = 0
                         self.boardArray[val[0]][val[1]] = 3
                         self.jumpp1+=1
+                        self.updatePlayers.emit(self.jumpp1, self.jumpp2)
                         self.resetPossMoves()
                     elif (self.oldcol - 2 == val[1]):
                         self.boardArray[self.oldrow + 1][self.oldcol - 1] = 0
                         self.boardArray[self.oldrow][self.oldcol] = 0
                         self.boardArray[val[0]][val[1]] = 3
                         self.jumpp1 += 1
+                        self.updatePlayers.emit(self.jumpp1, self.jumpp2)
                         self.resetPossMoves()
                     elif (self.oldcol + 2 == val[1]):
                         self.boardArray[self.oldrow - 1][self.oldcol + 1] = 0
                         self.boardArray[self.oldrow][self.oldcol] = 0
                         self.boardArray[val[0]][val[1]] = 3
                         self.jumpp1 += 1
+                        self.updatePlayers.emit(self.jumpp1, self.jumpp2)
                         self.resetPossMoves()
                     elif (self.oldcol - 2 == val[1]):
                         self.boardArray[self.oldrow - 1][self.oldcol - 1] = 0
                         self.boardArray[self.oldrow][self.oldcol] = 0
                         self.boardArray[val[0]][val[1]] = 3
                         self.jumpp1 += 1
+                        self.updatePlayers.emit(self.jumpp1, self.jumpp2)
                         self.resetPossMoves()
                     else:
                         self.boardArray[self.oldrow][self.oldcol] = 0
                         self.boardArray[val[0]][val[1]] = 3
                         self.resetPossMoves()
                         self.P1Turn = False
+                        self.updatepTurnSignal.emit(1)
 
             if (self.boardArray[self.oldrow][self.oldcol] == 1):
                 if (self.possMov[val[0]][val[1]] == 1):
@@ -227,6 +237,7 @@ class Board(QFrame):
                         if (val[0] == 7):
                             self.boardArray[val[0]][val[1]] = 3
                         self.jumpp1+=1
+                        self.updatePlayers.emit(self.jumpp1, self.jumpp2)
                         self.resetPossMoves()
                     elif (self.oldcol - 2 == val[1]):
                         self.boardArray[self.oldrow + 1][self.oldcol - 1] = 0
@@ -235,6 +246,7 @@ class Board(QFrame):
                         if (val[0] == 7):
                             self.boardArray[val[0]][val[1]] = 3
                         self.jumpp1 += 1
+                        self.updatePlayers.emit(self.jumpp1, self.jumpp2)
                         self.resetPossMoves()
                     else:
                         self.boardArray[self.oldrow][self.oldcol] = 0
@@ -243,9 +255,11 @@ class Board(QFrame):
                             self.boardArray[val[0]][val[1]] = 3
                         self.resetPossMoves()
                         self.P1Turn=False
+                        self.updatepTurnSignal.emit(1)
 
         if(self.P1Turn==False):
-
+            self.ptimer.start(Board.Speed, self)
+            self.timer.stop()
             if (self.boardArray[val[0]][val[1]] == 2):
                 self.resetPossMoves()
                 print('Red Piece is seleced')
@@ -263,30 +277,35 @@ class Board(QFrame):
                         self.boardArray[self.oldrow][self.oldcol] = 0
                         self.boardArray[val[0]][val[1]] = 4
                         self.jumpp2+=1
+                        self.updatePlayers.emit(self.jumpp1, self.jumpp2)
                         self.resetPossMoves()
                     elif (self.oldcol - 2 == val[1]):
                         self.boardArray[self.oldrow + 1][self.oldcol - 1] = 0
                         self.boardArray[self.oldrow][self.oldcol] = 0
                         self.boardArray[val[0]][val[1]] = 4
                         self.jumpp2 += 1
+                        self.updatePlayers.emit(self.jumpp1, self.jumpp2)
                         self.resetPossMoves()
                     elif (self.oldcol + 2 == val[1]):
                         self.boardArray[self.oldrow - 1][self.oldcol + 1] = 0
                         self.boardArray[self.oldrow][self.oldcol] = 0
                         self.boardArray[val[0]][val[1]] = 4
                         self.jumpp2 += 1
+                        self.updatePlayers.emit(self.jumpp1, self.jumpp2)
                         self.resetPossMoves()
                     elif (self.oldcol - 2 == val[1]):
                         self.boardArray[self.oldrow - 1][self.oldcol - 1] = 0
                         self.boardArray[self.oldrow][self.oldcol] = 0
                         self.boardArray[val[0]][val[1]] = 4
                         self.jumpp2 += 1
+                        self.updatePlayers.emit(self.jumpp1, self.jumpp2)
                         self.resetPossMoves()
                     else:
                         self.boardArray[self.oldrow][self.oldcol] = 0
                         self.boardArray[val[0]][val[1]] = 4
                         self.resetPossMoves()
                         self.P1Turn=True
+                        self.updatepTurnSignal.emit(0)
 
             if (self.boardArray[self.oldrow][self.oldcol] == 2):
                 if (self.possMov[val[0]][val[1]] == 1):
@@ -297,6 +316,7 @@ class Board(QFrame):
                         if(val[0]==0):
                             self.boardArray[val[0]][val[1]] = 4
                         self.jumpp2 += 1
+                        self.updatePlayers.emit(self.jumpp1, self.jumpp2)
                         self.resetPossMoves()
                     elif (self.oldcol - 2 == val[1]):
                         self.boardArray[self.oldrow - 1][self.oldcol - 1] = 0
@@ -305,6 +325,7 @@ class Board(QFrame):
                         if (val[0] == 0):
                             self.boardArray[val[0]][val[1]] = 4
                         self.jumpp2 += 1
+                        self.updatePlayers.emit(self.jumpp1, self.jumpp2)
                         self.resetPossMoves()
                     else:
                         self.boardArray[self.oldrow][self.oldcol] = 0
@@ -313,6 +334,7 @@ class Board(QFrame):
                             self.boardArray[val[0]][val[1]] = 4
                         self.resetPossMoves()
                         self.P1Turn=True
+                        self.updatepTurnSignal.emit(0)
 
         self.oldrow = val[0]
         self.oldcol = val[1]
@@ -478,15 +500,16 @@ class Board(QFrame):
         else:
             super(Board, self).timerEvent(event)  # other wise pass it to the super class for handling
 
-        if event.timerId() == self.ptimer.timerId() and Board.pCounter > 0:  # if the timer that has 'ticked' is the one in this class
-            if Board.pCounter > 0:
-                Board.pCounter = Board.pCounter - 1
-                print('timerEvent()', Board.pCounter)
-                self.updatepTimerSignal.emit(Board.pCounter)
+            # todo adapter this code to handle your timers
+            if event.timerId() == self.ptimer.timerId() and Board.pCounter > 0:  # if the timer that has 'ticked' is the one in this class
+                if Board.pCounter > 0:
+                    Board.pCounter = Board.pCounter - 1
+                    print('timerEvent()', Board.pCounter)
+                    self.updatepTimerSignal.emit(Board.pCounter)
+                else:
+                    print("Game over")
             else:
-                print("Game over")
-        else:
-            super(Board, self).timerEvent(event)  # other wise pass it to the super class for handling
+                super(Board, self).timerEvent(event)  # other wise pass it to the super class for handling
 
 
 
@@ -531,7 +554,6 @@ class Board(QFrame):
         self.ColorP1=color1
         self.ColorP2=color2
         self.timer.start(Board.Speed, self)
-        self.ptimer.start(Board.Speed, self)
 
 
     def drawPossibleMoves(self, painter):
