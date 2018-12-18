@@ -20,17 +20,21 @@ class Draughts(QMainWindow):
         mainMenu = self.menuBar()
 
         # SETTING UP TWO MENUS IN MENU BAR
-        fileMenu = mainMenu.addMenu(" File")
+        gameMenu = mainMenu.addMenu(" Game")
         optionAction = QAction(QIcon("./img/settings.png"), "Options", self)
-        fileMenu.addAction(optionAction)
+        gameMenu.addAction(optionAction)
         optionAction.triggered.connect(self.option)
 
+        pauseAction = QAction(QIcon("./img/pause.png"), "Pause Game", self)
+        gameMenu.addAction(pauseAction)
+        pauseAction.triggered.connect(self.tboard.pause)
+
         resetAction = QAction(QIcon("./img/reset.png"), "Reset", self)
-        fileMenu.addAction(resetAction)
+        gameMenu.addAction(resetAction)
         resetAction.triggered.connect(self.tboard.resetGame)
 
         exitAction = QAction(QIcon("./img/exit.png"), "Exit", self)
-        fileMenu.addAction(exitAction)
+        gameMenu.addAction(exitAction)
         exitAction.triggered.connect(self.exit)
 
         helpMenu = mainMenu.addMenu("Help")
@@ -115,7 +119,7 @@ class Draughts(QMainWindow):
         close.setWindowTitle("Exit")
         close.setWindowIcon(QIcon("./img/exit.png"))
         close.setText("Are you sure you want to quit?\n")
-        close.setStandardButtons(QMessageBox.Yes | QMessageBox.Save | QMessageBox.Cancel)
+        close.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
         close = close.exec()
         if close == QMessageBox.Yes:
             event.accept()
