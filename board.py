@@ -30,6 +30,7 @@ class Board(QFrame):
         0 are all empty fields on board. 1s are the pieces for the first player.
         2s are the pieces for player2. 8s are all the white squaeres on the field'''
         self.timer = QBasicTimer()
+        self.ptimer = QBasicTimer()
         self.isWaitingAfterLine = False
         self.start()
 
@@ -462,7 +463,6 @@ class Board(QFrame):
 
         return self.possMov
 
-
     def timerEvent(self, event):
         '''handles timer event'''
         # todo adapter this code to handle your timers
@@ -477,6 +477,19 @@ class Board(QFrame):
                 print("Game over")
         else:
             super(Board, self).timerEvent(event)  # other wise pass it to the super class for handling
+
+        if event.timerId() == self.ptimer.timerId() and Board.pCounter > 0:  # if the timer that has 'ticked' is the one in this class
+            if Board.pCounter > 0:
+                Board.pCounter = Board.pCounter - 1
+                print('timerEvent()', Board.pCounter)
+                self.updatepTimerSignal.emit(Board.pCounter)
+            else:
+                print("Game over")
+        else:
+            super(Board, self).timerEvent(event)  # other wise pass it to the super class for handling
+
+
+
     def resetGame(self):
         '''Method for resetting the game to its initial state.
         It calls the reset arrays methods and it resets the captures variables for each player'''
@@ -518,6 +531,7 @@ class Board(QFrame):
         self.ColorP1=color1
         self.ColorP2=color2
         self.timer.start(Board.Speed, self)
+        self.ptimer.start(Board.Speed, self)
 
 
     def drawPossibleMoves(self, painter):
