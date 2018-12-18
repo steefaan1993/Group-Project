@@ -9,7 +9,7 @@ class Board(QFrame):
     msg2Statusbar = pyqtSignal(str)
     updateTimerSignal = pyqtSignal(int)  # signal sent when timer is updated
     clickLocationSignal = pyqtSignal(str)  # signal sent when there is a new click location
-    # todo set the board with and height in square
+
     boardWidth = 8
     boardHeight = 8
     Speed = 300
@@ -23,12 +23,15 @@ class Board(QFrame):
         self.oldrow = 0
 
     def initBoard(self):
-        '''initiates board'''
+        '''initiates board with timer and the board array which
+        is the basic for the drawing of the board and the pieces
+        0 are all empty fields on board. 1s are the pieces for the first player.
+        2s are the pieces for player2. 8s are all the white squaeres on the field'''
         self.timer = QBasicTimer()
         self.isWaitingAfterLine = False
         self.start()
 
-        # self.setFocusPolicy(Qt.StrongFocus)
+
         self.isStarted = False
         self.isPaused = False
         self.resetGame()
@@ -61,6 +64,7 @@ class Board(QFrame):
         self.printBoardArray()
 
     def resetBoardArray(self):
+        '''Method for reseting the board array to its initial state'''
         self.boardArray = [
             [8, 4, 8, 1, 8, 1, 8, 1],
             [1, 8, 1, 8, 1, 8, 1, 8],
@@ -73,6 +77,7 @@ class Board(QFrame):
 
 
     def resetPossMoves(self):
+        '''Method for resetting the possible move array'''
         self.possMov = [
             [0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0],
@@ -89,11 +94,12 @@ class Board(QFrame):
         print('\n'.join(['\t'.join([str(cell) for cell in row]) for row in self.boardArray]))
 
     def printPossArray(self):
-        '''prints the boardArray in an arractive way'''
-        print("boardArray:")
+        '''prints the Possible MoveArray in an arractive way'''
+        print("PossMocdArray:")
         print('\n'.join(['\t'.join([str(cell) for cell in row]) for row in self.possMov]))
 
     def mousePosToColRow(self, event):
+        '''Method for translate mouseposition to the row and the colum of the board'''
         xMouseEvent = event.x()
         yMouseEvent = event.y()
         squareHeight = self.squareHeight()
@@ -143,16 +149,23 @@ class Board(QFrame):
         self.update()
 
     def paintEvent(self, event):
-        '''paints the board and the pieces of the game'''
+        '''paints the board, the pieces of the game
+        and the possible moves a player can make'''
         painter = QPainter(self)
         self.drawBoardSquares(painter)
         self.drawPossibleMoves(painter)
         self.drawPieces(painter)
 
     def mousePressEvent(self, event):
-        '''jljklkjlkj'''
+        '''Method for handling the event of the mouse pressing,
+        this means that when someones clicks on a piece it gets selected
+         and when the user selectes a square which is highlighted the piece moves to this position.
+         At first it checks what kind of a piece and from what player it is.
+         Then it calls the methods for finding the possible moves for that piece.
+         After that it checks if a caputre is happening and incremnts the capture counter.
+         After that it checks if there is a piece which needs to be turnend into a king.'''
         print("click location [", event.x(), ",", event.y(), "]")
-        # todo you could call some game locig here
+
 
         val = self.mousePosToColRow(event)
         print(val[0], val[1])
@@ -163,12 +176,13 @@ class Board(QFrame):
                 self.resetPossMoves()
                 print('Yellow Piece is seleced')
                 self.possMov = self.findingValidFieldsPlayer1(val[0], val[1])
-                # print(possmov)
+
+
             elif(self.boardArray[val[0]][val[1]] ==3):
                 self.resetPossMoves()
-                print('Yellow Piece is seleced')
+                print('Yellow King is seleced')
                 self.possMov = self.findingValidMovesForKing(val[0], val[1])
-                # print(possmov)
+
 
             if (self.boardArray[self.oldrow][self.oldcol] == 3):
                 if (self.possMov[val[0]][val[1]] == 1):
@@ -237,7 +251,7 @@ class Board(QFrame):
                 # print(possmov)
             elif (self.boardArray[val[0]][val[1]] == 4):
                 self.resetPossMoves()
-                print('Yellow Piece is seleced')
+                print('Red King is seleced')
                 self.possMov = self.findingValidMovesForKing(val[0], val[1])
                 # print(possmov)
             if (self.boardArray[self.oldrow][self.oldcol] == 4):
@@ -301,12 +315,17 @@ class Board(QFrame):
         self.oldrow = val[0]
         self.oldcol = val[1]
 
-        # self.printBoardArray()
+
         self.printPossArray()
 
         self.update()
 
     def findingValidMovesForKing(self, oldrow, oldcol):
+        '''Method for finding the possible squares to move to for a king for both players.
+        At first it checks for vvalid fields in the row above.
+        If there is a piece of a opposite player on a valid field it checks for valid fields in the row above.
+        Then it checks in the row below the starting row for valid fields.
+        If there is a piece of a opposite player on a valid field it checks the row below for valid fields.'''
         jumpPossible = False
         oldrow += 1
         if (oldrow < 8):
@@ -368,6 +387,9 @@ class Board(QFrame):
 
 
     def findingValidFieldsPlayer1(self, oldrow, oldcol):
+        '''Method for finding the possible squares to move to for a piece of player1.
+        At first it checks for vvalid fields in the row above.
+        If there is a piece of a opposite player on a valid field it checks for valid fields in the row above.'''
         jumpPossible = False
         oldrow += 1
         if (oldrow < 8):
@@ -402,6 +424,9 @@ class Board(QFrame):
 
 
     def findingValidFieldsPlayer2(self, oldrow, oldcol):
+        '''Method for finding the possible squares to move to for a piece of player2.
+                At first it checks for vvalid fields in the row below the starting row.
+                If there is a piece of a opposite player on a valid field it checks for valid fields in the row below.'''
         jumpPossible=False
         oldrow -= 1
         if (oldrow <=7 and oldrow>=0):
@@ -450,20 +475,22 @@ class Board(QFrame):
             super(Board, self).timerEvent(event)  # other wise pass it to the super class for handling
 
     def resetGame(self):
+        '''Method for resetting the game to its initial state.
+        It calls the reset arrays methods and it resets the captures variables for each player'''
         self.resetPossMoves()
         self.resetBoardArray()
         self.jumpp1=0
         self.jumpp2=0
         self.update()
         '''clears pieces from the board'''
-        # todo write code to reset game
+
 
     def tryMove(self, newX, newY):
         '''tries to move a piece'''
 
     def drawBoardSquares(self, painter):
-        '''draw all the square on the board'''
-        # todo set the dafault colour of the brush
+        '''Method for drawing all the squares on the board'''
+
         painter.setBrush(Qt.white)
 
         colTransformation = self.squareWidth()
@@ -484,11 +511,13 @@ class Board(QFrame):
                 painter.restore()
 
     def ColorSelection(self, color1, color2):
+        '''Method for setting the color of the piece of the squares'''
         self.ColorP1=color1
         self.ColorP2=color2
 
 
     def drawPossibleMoves(self, painter):
+        '''Method for drawing the highlighting of possible fields a piece or a king can move to'''
         painter.setBrush(Qt.transparent)
 
         colTransformation = self.squareWidth()
@@ -507,7 +536,7 @@ class Board(QFrame):
                 painter.setBrush(Qt.transparent)
 
     def drawPieces(self, painter):
-        '''draw the prices on the board'''
+        '''Method for drawing the pieces or a king on the board which are setted in the board array.'''
         painter.setPen(Qt.transparent)
         painter.setBrush(Qt.transparent)
         colTransformation = self.squareWidth()
@@ -516,15 +545,13 @@ class Board(QFrame):
             for col in range(0, len(self.boardArray[0])):
                 painter.save()
                 painter.translate(col * colTransformation, row * rowTransformation)
-                draw = False
-                # Todo choose your colour and set the painter brush to the correct colour
+
                 if self.boardArray[row][col] == 1 or self.boardArray[row][col] == 3:
                     painter.setBrush(self.ColorP1)
 
                 elif self.boardArray[row][col] == 2 or self.boardArray[row][col]==4:
                     painter.setBrush(self.ColorP2)
 
-                # Todo draw some the pieces as elipses
                 radiusW = (self.squareWidth() - 2) / 2
                 radiusH = (self.squareHeight() - 2) / 2
                 center = QPoint(radiusW, radiusH)
