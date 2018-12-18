@@ -54,6 +54,7 @@ class Draughts(QMainWindow):
         self.show()
         self.option()
 
+
     def center(self):
         '''centers the window on the screen'''
         screen = QDesktopWidget().screenGeometry()
@@ -97,7 +98,7 @@ class Draughts(QMainWindow):
             player2colour = Qt.green
         self.tboard.ColorSelection(player1colour, player2colour)
         self.scoreBoard.seticon(item, item2)
-
+        self.tboard.start()
 
     def exit(
             self):  # it's an option for users to pick to exit. It'll automatically get connected to the closeEvent method down below.
