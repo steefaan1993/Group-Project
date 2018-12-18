@@ -16,16 +16,16 @@ class ScoreBoard(QDockWidget):
         self.resize(200, 200)
         self.center()
         self.setWindowTitle('ScoreBoard')
-        self.timerLabel = QLabel('Timer: ')
-        self.pTimerLabel = QLabel('Player Timer: ')
+        self.timerLabel = QLabel('Player1 Timer: ')
+        self.pTimerLabel = QLabel('Player2 Timer: ')
         self.labelP1 = QLabel('Player 1')
         self.labelP2 = QLabel('Player 2')
         self.turnLabelP1 = QLabel("<font color='red'><strong>Your Turn</strong></font>")
-        self.turnLabelP2 = QLabel('')
-        self.captureP1 = QLabel('Captures: ')
-        self.captureP2 = QLabel('Captures: ')
-        self.remainingP1 = QLabel('Remaining: ')
-        self.remainingP2 = QLabel('Remaining: ')
+        self.turnLabelP2 = QLabel("")
+        self.captureP1 = QLabel('Captures: 0')
+        self.captureP2 = QLabel('Captures: 0')
+        self.remainingP1 = QLabel('Remaining: 12')
+        self.remainingP2 = QLabel('Remaining: 12')
         self.space1 = QLabel("<font color='green'>---------</font>")
         self.space2 = QLabel("<font color='green'>---------</font>")
         self.space3 = QLabel("<font color='green'>---------</font>")
@@ -79,6 +79,8 @@ class ScoreBoard(QDockWidget):
         # when the updateTimerSignal is emitted in the board the setTimeRemaining slot receives it
         board.updateTimerSignal.connect(self.setTimeRemaining)
         board.updatepTimerSignal.connect(self.setpTimeRemaining)
+        board.updatepTurnSignal.connect(self.setTurnLabel)
+        board.updatePlayers.connect(self.setPlayerStats)
 
     @pyqtSlot(str) # checks to make sure that the following slot is receiving an arguement of the right type
     def setClickLocation(self, clickLoc):
@@ -92,7 +94,7 @@ class ScoreBoard(QDockWidget):
         sr = timeRemaining % 60
         mr = timeRemaining // 60
 
-        update = "Timer: " + str(mr) + ":" + str(sr)
+        update = "Player1 Timer: " + str(mr) + ":" + str(sr)
         self.timerLabel.setText(update)
         print('slot '+update)
         #self.redraw()
@@ -101,10 +103,28 @@ class ScoreBoard(QDockWidget):
 
     @pyqtSlot(int)
     def setpTimeRemaining(self, pTimeRemaining):
-        update2 = "Player Timer: " + str(pTimeRemaining)
+        sr = pTimeRemaining % 60
+        mr = pTimeRemaining // 60
+        update2 = "Player2 Timer: " + str(mr) + ":" + str(sr)
         self.pTimerLabel.setText(update2)
         print('slot ' + update2)
         # self.redraw()
+
+    @pyqtSlot(int)
+    def setTurnLabel(self, tmp):
+        if tmp == 1:
+            self.turnLabelP1.setText(" ")
+            self.turnLabelP2.setText("<font color='red'><strong>Your Turn</strong></font>")
+        else:
+            self.turnLabelP2.setText(" ")
+            self.turnLabelP1.setText("<font color='red'><strong>Your Turn</strong></font>")
+
+    @pyqtSlot(int, int)
+    def setPlayerStats(self, j1, j2):
+        self.captureP1.setText("Captures: " + str(j1))
+        self.remainingP1.setText("Remaining: " + str(12-j2))
+        self.captureP2.setText("Captures: " + str(j2))
+        self.remainingP2.setText("Remaining: " + str(12 - j1))
 
     def seticon(self, p1, p2):
         player1 = p1.lower()
