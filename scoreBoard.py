@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QDockWidget, QGridLayout, QLabel, QWidget
+from PyQt5.QtWidgets import QDockWidget, QGridLayout, QLabel, QWidget, QMessageBox
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import pyqtSlot
 from board import Board
@@ -42,23 +42,23 @@ class ScoreBoard(QDockWidget):
         self.space1.resize(70,70)
         self.space2.resize(70, 70)
         grid = QGridLayout()
-        grid.addWidget(self.timerLabel, 0, 0)
-        grid.addWidget(self.pTimerLabel, 1, 0)
-        grid.addWidget(self.space1, 2, 0)
-        grid.addWidget(self.space2, 2, 1)
-        grid.addWidget(self.avatar1Label, 3, 0)
-        grid.addWidget(self.labelP1, 3,1)
-        grid.addWidget(self.turnLabelP1, 4, 1)
-        grid.addWidget(self.captureP1, 5, 0)
-        grid.addWidget(self.remainingP1, 6, 0)
-        grid.addWidget(self.space3, 7, 0)
-        grid.addWidget(self.space4, 7, 1)
 
-        grid.addWidget(self.avatar2Label,8, 0)
-        grid.addWidget(self.labelP2, 8, 1)
-        grid.addWidget(self.turnLabelP2, 9, 1)
-        grid.addWidget(self.captureP2, 10, 0)
-        grid.addWidget(self.remainingP2, 11, 0)
+
+        grid.addWidget(self.avatar1Label, 1, 0)
+        grid.addWidget(self.labelP1, 1,1)
+        grid.addWidget(self.timerLabel, 2, 0)
+        grid.addWidget(self.turnLabelP1, 2, 1)
+        grid.addWidget(self.captureP1, 3, 0)
+        grid.addWidget(self.remainingP1, 4, 0)
+        grid.addWidget(self.space3, 5, 0)
+        grid.addWidget(self.space4, 5, 1)
+
+        grid.addWidget(self.avatar2Label,6, 0)
+        grid.addWidget(self.labelP2, 6, 1)
+        grid.addWidget(self.pTimerLabel, 7, 0)
+        grid.addWidget(self.turnLabelP2, 7, 1)
+        grid.addWidget(self.captureP2, 8, 0)
+        grid.addWidget(self.remainingP2, 9, 0)
 
 
         self.setLayout(grid)
@@ -100,6 +100,7 @@ class ScoreBoard(QDockWidget):
         #self.redraw()
         if Board.counter == 0:
             self.timerLabel.setText("GameOver")
+            self.gameover("Player one")
 
     @pyqtSlot(int)
     def setpTimeRemaining(self, pTimeRemaining):
@@ -108,7 +109,10 @@ class ScoreBoard(QDockWidget):
         update2 = "Player2 Timer: " + str(mr) + ":" + str(sr)
         self.pTimerLabel.setText(update2)
         print('slot ' + update2)
-        # self.redraw()
+        if Board.pCounter == 0:
+            self.timerLabel.setText("GameOver")
+            self.gameover("Player two")
+
 
     @pyqtSlot(int)
     def setTurnLabel(self, tmp):
@@ -134,5 +138,11 @@ class ScoreBoard(QDockWidget):
         self.avatar2.load("./img/" + player2 + ".png")
         self.avatar2Label.setPixmap(self.avatar2)
         self.update()
+
+    def gameover(self, player):
+        QMessageBox.information(self, "Message", "%s has lost because he has no time left " %player)
+
+
+
 
 
