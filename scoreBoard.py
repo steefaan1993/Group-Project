@@ -20,7 +20,7 @@ class ScoreBoard(QDockWidget):
         self.pTimerLabel = QLabel('Player2 Timer: ')
         self.labelP1 = QLabel('Player 1')
         self.labelP2 = QLabel('Player 2')
-        self.turnLabelP1 = QLabel("<font color='red'><strong>Your Turn</strong></font>")
+        self.turnLabelP1 = QLabel("<font color='red'><strong>YOUR TURN</strong></font>")
         self.turnLabelP2 = QLabel("")
         self.captureP1 = QLabel('Captures: 0')
         self.captureP2 = QLabel('Captures: 0')
@@ -94,34 +94,40 @@ class ScoreBoard(QDockWidget):
         sr = timeRemaining % 60
         mr = timeRemaining // 60
 
-        update = "Player1 Timer: " + str(mr) + ":" + str(sr)
+        if sr > 9:
+            update = "Player1 Timer: " + str(mr) + ":" + str(sr)
+        else:
+            update = "Player1 Timer: " + str(mr) + ":0" + str(sr)
         self.timerLabel.setText(update)
         print('slot '+update)
         #self.redraw()
         if Board.counter == 0:
             self.timerLabel.setText("GameOver")
-            self.gameover("Player one")
+            self.gameover("Player 1")
 
     @pyqtSlot(int)
     def setpTimeRemaining(self, pTimeRemaining):
         sr = pTimeRemaining % 60
         mr = pTimeRemaining // 60
-        update2 = "Player2 Timer: " + str(mr) + ":" + str(sr)
+        if sr > 9:
+            update2 = "Player2 Timer: " + str(mr) + ":" + str(sr)
+        else:
+            update2 = "Player2 Timer: " + str(mr) + ":0" + str(sr)
         self.pTimerLabel.setText(update2)
         print('slot ' + update2)
         if Board.pCounter == 0:
             self.timerLabel.setText("GameOver")
-            self.gameover("Player two")
+            self.gameover("Player 2")
 
 
     @pyqtSlot(int)
     def setTurnLabel(self, tmp):
         if tmp == 1:
             self.turnLabelP1.setText(" ")
-            self.turnLabelP2.setText("<font color='red'><strong>Your Turn</strong></font>")
+            self.turnLabelP2.setText("<font color='red'><strong>YOUR TURN</strong></font>")
         else:
             self.turnLabelP2.setText(" ")
-            self.turnLabelP1.setText("<font color='red'><strong>Your Turn</strong></font>")
+            self.turnLabelP1.setText("<font color='red'><strong>YOUR TURN</strong></font>")
 
     @pyqtSlot(int, int)
     def setPlayerStats(self, j1, j2):
@@ -129,6 +135,10 @@ class ScoreBoard(QDockWidget):
         self.remainingP1.setText("Remaining: " + str(12-j2))
         self.captureP2.setText("Captures: " + str(j2))
         self.remainingP2.setText("Remaining: " + str(12 - j1))
+        if j1 == 12:
+            self.winner("Player 1")
+        if j2 == 12:
+            self.winner("Player 2")
 
     def seticon(self, p1, p2):
         player1 = p1.lower()
@@ -140,7 +150,9 @@ class ScoreBoard(QDockWidget):
         self.update()
 
     def gameover(self, player):
-        QMessageBox.information(self, "Message", "%s has lost because he has no time left " %player)
+        QMessageBox.information(self, "Message", "%s ran out of time and lost. " %player)
+    def winner(self, player):
+        QMessageBox.information(self, "Message", "%s Won. " %player)
 
 
 
